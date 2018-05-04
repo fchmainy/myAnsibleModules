@@ -38,11 +38,12 @@ class BigIpCommon(object):
         self._virtual = module.params.get('virtual')
         self._manualVirtualServers = []	#module.params.get('manualVirtualServers')
         self._parentPolicyName = module.params.get('parentPolicyName')
+	self._policyTemplate = module.params.get('policyTemplate')
         self._appLang = module.params.get('lang')
         self._enforceMode = module.params.get('enforcementMode')
         self._validate_certs = module.params.get('validate_certs')
 	self._virtualServers = ["/" + self._partition + "/" + self._virtual]
-
+	
 class BigIpRest(BigIpCommon):
     def __init__(self, module):
         super(BigIpRest, self).__init__(module)
@@ -50,19 +51,32 @@ class BigIpRest(BigIpCommon):
         self._uri = 'https://%s/mgmt/tm/asm/policies' % (self._hostname)
 
         self._headers = {'Content-Type': 'application/json', 'X-F5-REST-Coordination-Id': self._transactionId}
-        
-	self._payload = {
-            "name": self._name, 
-            "description": self._description,
-            "partition": self._partition,
-            "hasParent": self._hasParent,
-	    "parentPolicyName": self._parentPolicyName,
-	    "virtualServers": self._virtualServers,
-	    "manualVirtualServers": self._manualVirtualServers, 
-            "applicationLanguage": self._appLang,
-            "enforcementMode": self._enforceMode
-        }
 
+	if self._hasParent == false:
+		self._payload = {
+	            	"name": self._name, 
+            		"description": self._description,
+            		"partition": self._partition,
+            		"hasParent": self._hasParent,
+	    		"templateReference": self._policyTemplate,
+	    		"virtualServers": self._virtualServers,
+	    		"manualVirtualServers": self._manualVirtualServers, 
+            		"applicationLanguage": self._appLang,
+            		"enforcementMode": self._enforceMode
+        	}
+	else:
+		self._payload = {
+	            	"name": self._name, 
+             		"description": self._description,
+            		"partition": self._partition,
+            		"hasParent": self._hasParent,
+	    		"parentPolicyName": self._parentPolicyName,
+	    		"virtualServers": self._virtualServers,
+	    		"manualVirtualServers": self._manualVirtualServers, 
+            		"applicationLanguage": self._appLang,
+            		"enforcementMode": self._enforceMode
+        	}
+		
     def read(self):
         resp = requests.get(self._uri,
                             auth=(self._username, self._password),
@@ -109,8 +123,8 @@ def main():
             description=dict(default=''),
 	    virtual=dict(required=True),
 	    hasParent=dict(default='true'),
-#	    manualVirtualServers=dict(default=[]),
 	    parentPolicyName=dict(default='/Common/myParentPolicy'),
+	    policyTemplate=dict(default=''),
 	    caseInsensitive=dict(default='false', type='bool'),
             lang=dict(default='utf-8', choices=['utf-8', 'western']),
             enforcementMode=dict(default='blocking', choices=['blocking', 'transparent']),

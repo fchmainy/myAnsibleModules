@@ -36,14 +36,13 @@ class BigIpCommon(object):
         self._description = module.params.get('description')
         self._hasParent = module.params.get('hasParent')
         self._virtual = module.params.get('virtual')
-        self._manualVirtualServers = []	#module.params.get('manualVirtualServers')
         self._parentPolicyName = module.params.get('parentPolicyName')
-	self._policyTemplate = module.params.get('policyTemplate')
+		self._policyTemplate = module.params.get('policyTemplate')
         self._appLang = module.params.get('lang')
         self._enforceMode = module.params.get('enforcementMode')
         self._validate_certs = module.params.get('validate_certs')
-	self._virtualServers = ["/" + self._partition + "/" + self._virtual]
-	
+		self._virtualServers = ["/" + self._partition + "/" + self._virtual]
+
 class BigIpRest(BigIpCommon):
     def __init__(self, module):
         super(BigIpRest, self).__init__(module)
@@ -52,15 +51,14 @@ class BigIpRest(BigIpCommon):
 
         self._headers = {'Content-Type': 'application/json', 'X-F5-REST-Coordination-Id': self._transactionId}
 
-	if self._hasParent == false:
+	if self._hasParent == 'false':
 		self._payload = {
 	            	"name": self._name, 
             		"description": self._description,
             		"partition": self._partition,
             		"hasParent": self._hasParent,
-	    		"templateReference": self._policyTemplate,
-	    		"virtualServers": self._virtualServers,
-	    		"manualVirtualServers": self._manualVirtualServers, 
+	    			"templateReference": self._policyTemplate,
+	    			"virtualServers": self._virtualServers, 
             		"applicationLanguage": self._appLang,
             		"enforcementMode": self._enforceMode
         	}
@@ -70,13 +68,12 @@ class BigIpRest(BigIpCommon):
              		"description": self._description,
             		"partition": self._partition,
             		"hasParent": self._hasParent,
-	    		"parentPolicyName": self._parentPolicyName,
-	    		"virtualServers": self._virtualServers,
-	    		"manualVirtualServers": self._manualVirtualServers, 
+	    			"parentPolicyName": self._parentPolicyName,
+	    			"virtualServers": self._virtualServers, 
             		"applicationLanguage": self._appLang,
             		"enforcementMode": self._enforceMode
         	}
-		
+
     def read(self):
         resp = requests.get(self._uri,
                             auth=(self._username, self._password),
@@ -125,12 +122,12 @@ def main():
             partition=dict(
 		    	default='Common',
                  	fallback=(env_fallback, ['F5_PARTITION'])
-	    		),     
+	    		),
             name=dict(required=True),
             description=dict(default=''),
 	    virtual=dict(required=True),
-	    hasParent=dict(default='true'),
-	    parentPolicyName=dict(default='/Common/myParentPolicy'),
+	    hasParent=dict(default='false'),
+	    parentPolicyName=dict(default=''),
 	    policyTemplate=dict(default=''),
 	    caseInsensitive=dict(default='false', type='bool'),
             lang=dict(default='utf-8', choices=['utf-8', 'western']),
@@ -141,19 +138,17 @@ def main():
 	    	    fallback=(env_fallback, ['F5_USER'])
 	    	),
             password=dict(
-		    required=True),
+		    required=True,
 	            aliases=['passwd'],
 	            fallback=(env_fallback, ['F5_PASSWORD'])
                     ),
             validate_certs=dict(
-		    default='no', 
+		    default='no',
 		    type='bool',
 	    	    fallback=(env_fallback, ['F5_VALIDATE_CERTS'])
 	    )
         )
-
-    )
-
+)
 
     obj = BigIpRest(module)
 

@@ -14,7 +14,7 @@ EXAMPLES = '''
 '''
 
 import socket
-
+from ansible.module_utils.basic import env_fallback
 
 try:
     import json
@@ -116,9 +116,16 @@ def main():
 
     module = AnsibleModule(
        argument_spec=dict(
-            server=dict(required=True),
+            server=dict(
+		    required=True,
+	    	    aliases=['hostname'],
+	    	    fallback=(env_fallback, ['F5_SERVER'])
+	           ),
             transactionId=dict(default=''),
-            partition=dict(default='Common'),     
+            partition=dict(
+		    	default='Common',
+                 	fallback=(env_fallback, ['F5_PARTITION'])
+	    		),     
             name=dict(required=True),
             description=dict(default=''),
 	    virtual=dict(required=True),
@@ -128,9 +135,21 @@ def main():
 	    caseInsensitive=dict(default='false', type='bool'),
             lang=dict(default='utf-8', choices=['utf-8', 'western']),
             enforcementMode=dict(default='blocking', choices=['blocking', 'transparent']),
-            user=dict(required=True, aliases=['username']),
-            password=dict(required=True),
-            validate_certs=dict(default='no', type='bool')
+            user=dict(
+		    required=True, 
+		    aliases=['username'],
+	    	    fallback=(env_fallback, ['F5_USER'])
+	    	),
+            password=dict(
+		    required=True),
+	            aliases=['passwd'],
+	            fallback=(env_fallback, ['F5_PASSWORD'])
+                    ),
+            validate_certs=dict(
+		    default='no', 
+		    type='bool',
+	    	    fallback=(env_fallback, ['F5_VALIDATE_CERTS'])
+	    )
         )
 
     )

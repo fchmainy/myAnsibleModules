@@ -35,7 +35,7 @@ class BigIpRest(BigIpCommon):
         super(BigIpRest, self).__init__(module)
 
 	self._fullPolicyName = '~%s~%s' % (self._partition,self._policyName)
-	self._uri = 'https://%s/mgmt/tm/asm/policies?%s' % (self._hostname,self._fullPolicyName)
+	self._uri = 'https://%s/mgmt/tm/asm/policies/%s' % (self._hostname,self._fullPolicyName)
         
 	self._headers = {
             'Content-Type': 'application/json'

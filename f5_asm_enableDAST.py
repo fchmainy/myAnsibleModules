@@ -58,7 +58,7 @@ class BigIpRest(BigIpCommon):
                             verify=self._validate_certs)
 
 
-        if resp.status_code == 201:
+        if resp.status_code == 200 or resp.status_code == 201:
             		changed = True
         else:
             		res = resp.json()

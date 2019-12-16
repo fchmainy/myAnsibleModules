@@ -31,6 +31,7 @@ class BigIpCommon(object):
         self._password = module.params.get('password')
         self._hostname = module.params.get('server')
         self._policyId = module.params.get("policyId")
+	self._scanner_type = module.params.get('scanner_type')
         self._validate_certs = module.params.get('validate_certs')
 
 
@@ -43,7 +44,7 @@ class BigIpRest(BigIpCommon):
             'Content-Type': 'application/json',
         }
         self._payload = {
-		"scannerType": "generic"
+		"scannerType": self._scanner_type
         }
 
 
@@ -73,6 +74,7 @@ def main():
             server=dict(required=True),
             validate_certs=dict(default='no', type='bool'),
             password=dict(required=True),
+	    scanner_type=dict(required=False, default='generic', choices=['generic','qualys']),
             user=dict(required=True, aliases=['username']),
             policyId=dict(required=True),
         )
